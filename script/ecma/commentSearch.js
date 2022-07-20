@@ -12,8 +12,9 @@
 
 'use strict';
 
-const g_args = ((args = PPx.Arguments()) => {
+const g_args = ((args = PPx.Arguments) => {
   const len = args.Length;
+
   return {
     uniq: len && args.Item(0) !== '0',
     title: len >= 2 ? args.Item(1) : 'Search comments..'

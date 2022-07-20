@@ -1,4 +1,5 @@
 ﻿//!*script
+// deno-lint-ignore-file no-var
 /**
  * Search comments
  *
@@ -16,7 +17,7 @@ var g_args = (function (args) {
     uniq: len && args.Item(0) !== '0',
     title: len >= 2 ? args.Item(1) : 'Search comments..'
   };
-})(PPx.Arguments());
+})(PPx.Arguments);
 
 var reg_terms = (function (args) {
   var msg = args.uniq ? '    And:[a b]  Minus:[a b-]  Or:[a|b]' : '';
