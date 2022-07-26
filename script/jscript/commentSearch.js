@@ -27,7 +27,7 @@ var reg_terms = (function (args) {
     ? ' %%%%: *completelist -set -file:%%su""taglist"" -detail:""user1""'
     : '';
   var minus = '';
-  var a = [1, '', args.title, msg, args.ref, 'l', compList];
+  var a = [1, '', args.title + msg, args.ref, 'l', compList];
   var input =
     PPx.Extract('%*script(%*getcust(S_ppm#global:lib)\\input.js,' + a.join(',') + ')') ||
     PPx.Quit(-1);
