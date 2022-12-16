@@ -1,10 +1,11 @@
 ﻿//!*script
 /**
- * Search comments
+ * Search for search terms in comments
  *
- * @arg 0 If nonzero search by unique specifications
- * @arg 1 Search-bar title
- * @arg 2 Reference history
+ * @arg {number} 0 If nonzero use regexp
+ * @arg {string} 1 Search-bar title
+ * @arg {string} 2 history to refer
+ * @arg {string} 3 Complete-list path
  * NOTE:
  *  And-search, if it contains whitespace
  *  Minus-search, if it contains a space and ends with "-"
@@ -13,54 +14,82 @@
 
 'use strict';
 
+/* Import modules */
+const st = PPx.CreateObject('ADODB.stream');
+let module = function (filepath) {
+  st.Open;
+  st.Type = 2;
+  st.Charset = 'UTF-8';
+  st.LoadFromFile(filepath);
+  const data = st.ReadText(-1);
+  st.Close;
+
+  return Function(' return ' + data)();
+};
+
+// Load modules
+const input = module(PPx.Extract('%*getcust(S_ppm#global:module)\\input.js'));
+module = null;
+
 const g_args = ((args = PPx.Arguments) => {
-  const len = args.Length;
+  const arr = ['0', 'Search comments..', 'e', ''];
+
+  for (let i = 0, l = args.length; i < l; i++) {
+    arr[i] = args.Item(i);
+  }
 
   return {
-    uniq: len && args.Item(0) !== '0',
-    title: len >= 2 ? args.Item(1) : 'Search comments..',
-    ref: len >= 3 ? args.Item(2) : 'e'
+    uniq: arr[0] !== '0',
+    title: arr[1],
+    refer: arr[2],
+    complist: arr[3]
   };
 })();
 
-const reg_terms = ((args = g_args) => {
-  const msg = args.uniq ? '    And:[a b]  Minus:[a b-]  Or:[a|b]' : '';
-  const compList = PPx.Extract('%*getcust(S_ppm#user:taglist)')
-    ? ' %%%%: *completelist -set -file:%%su""taglist"" -detail:""user1""'
-    : '';
-  let minus = '';
-  let input =
-    PPx.Extract(
-      `%*script(%*getcust(S_ppm#global:lib)\\input.js,1,,${args.title}${msg},${args.ref},l,${compList})`
-    ) || PPx.Quit(-1);
+const input_term = (args = g_args) => {
+  const msg = args.uniq ? '    [And: {a.b}, Minus: {a.b-}, Or: {a|b}]' : '';
+  let terms = input.lied.call({
+    title: args.title + msg,
+    mode: args.refer,
+    select: 'l',
+    k: '-detail:"user1"',
+    listname: args.complist
+  });
 
-  if (args.uniq) {
-    input = (() => {
-      if (~input.indexOf('|') || !~input.indexOf(' ')) {
-        return input;
-      }
-
-      return input.replace(/([^\s-]*)(.)/g, (_p0, p1, p2) => {
-        const fmt = {
-          ' ': `(?=.*${p1})`,
-          '-': `(?!.*${p1})`
-        };
-
-        if (p2 === '-') {
-          minus = `^(?!${p1})`;
-        }
-
-        return fmt[p2] || fmt[' '];
-      });
-    })();
+  if (!args.uniq) {
+    return terms;
   }
 
-  return new RegExp(minus + input, 'i');
-})();
+  terms = (() => {
+    if (~terms.indexOf('-')) {
+      return ~terms.indexOf('.')
+        ? terms.replace(/^([^\.]+)\.([^-]+)-/, '(?=.*$1)(?!.*$2)')
+        : terms.replace(/^([^-]+)-/, '^(?!$1)');
+    }
+
+    if (~terms.indexOf('.')) {
+      return terms.replace(/([^\.]+)\.(.+)/, '(?=.*$1)(?=.*$2)');
+    }
+
+    return terms;
+  })();
+
+  return new RegExp(`(${terms})`, 'i');
+};
+
+const search_term = input_term();
+const has_term = {
+  true(c) {
+    return !search_term.test(c);
+  },
+  false(c) {
+    return !~c.toLowerCase().indexOf(search_term.toLowerCase());
+  }
+}[g_args.uniq];
 
 for (let i = PPx.EntryDisplayCount; i--; ) {
   const thisEntry = PPx.Entry(i);
-  if (!reg_terms.test(thisEntry.Comment)) {
+  if (has_term(thisEntry.Comment)) {
     thisEntry.Hide;
   }
 }
