@@ -21,6 +21,8 @@ Repository: https://github.com/tar80/ppm-comment
 
 	dist\commentLF.js	コメントをリストファイルとして開く
 		第一引数はリストの表示形式を指定。default: M wF20 s1
+		第二引数はリストファイルを書き出す文字エンコード。
+			"utf8"(default) or "utf16le"
 
 	complist\commentlist.txt	コメント検索の補完候補リスト
 
@@ -30,3 +32,52 @@ Repository: https://github.com/tar80/ppm-comment
 PPc
 	^[	コメント検索
 
+===============================================================================
+コメントエントリの使い方
+
+コメントエントリは、00_INDEX.TXT内のコメントを仮想エントリとしてPPcのエントリ
+リスト上に展開したものです。
+
+1. 最初にコメントエントリの呼び出し設定を登録します。ppm-commentの設定内では
+  "$entrycomment"(キー設定)、または"$extcomment"(拡張子設定)にあたります。
+   メニューに設定したいときは、次の設定をメニューに追加します。
+
+   *string o,pwd=%*script("%sgu'ppmlib'\expandSource.js",ppm-comment,path)
+   *script %so'pwd'\dist\commentLF.js,"表示形式",utf8
+
+   ※"表示形式"はリストファイル内にメタ情報として設定されます。
+   ※utf8は書き出すリストファイルの文字エンコードです。必要であれば、utf16le
+      も指定できます
+
+2. エントリをファイルパスとして扱うためには、"実行アクション"と、そのコマンドを
+   実行するための"呼び出しキー"設定が必要です。"呼び出しキー"は次のように設定します。
+
+   KC_main = {
+   V , *if 4==%*js("PPx.result=PPx.DirectoryType")%:*script %sgu'ppmlib'\lfActions.js,abc,enclose
+       *ppv
+   }
+
+   ※lfActions.jsの第一引数を"コマンドエイリアス"と呼称します。
+     ユーザーはコマンドエイリアスを自由に設定できます。
+   ※第二引数は空白を含むパスの処理方法です。"enclose"(default)は、パスを"で括ります。
+   ※第三引数は重複したパスを実行するかどうかを"0"か"1"で指定します。ppm-commentでは使いません。
+
+3. "実行アクション"は S_ppm#actions の項目として設定します。
+
+   S_ppm#actions = {
+   comment_abc = *ppv ${path}
+   }
+
+   ※subidは、"プラグインエイリアス"と"コマンドエイリアス"をアンダースコアで
+   つないでものになります。"プラグインエイリアス"はリストファイルのメタ情報として
+   設定されています。ppm-commentの"プラグインエイリアス"は"comment"です。
+   ※コメントエントリの"実行アクション"には変数"${path}"を利用できます。
+   変数"${path}"にはマークエントリを空白で区切ったパスが入っています。
+   パスに空白が含まれるときは、そのパスを"で括ります。lfActions.jsの第二引数に
+   "double"を指定したときは、""で括ります。"escape"を指定したときは、\でエスケープします。
+
+lfActions.jsの第二引数と戻り値
+
+enclose	"path\to\file A" path\to\fileB
+double	""path\to\file A"" path\to\fileB
+escape  path\to\file\ A path\to\fileB

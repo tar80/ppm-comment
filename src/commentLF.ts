@@ -1,4 +1,4 @@
-/* @file Search for string in comments
+/* @file Open comments as virtual entries
  * @arg 0 {string} - Specifies the format of *viewstyle
  * @arg 1 {string} - Specifies the encoding of ListFile. 'utf8' | 'utf16le'
  */
@@ -40,7 +40,7 @@ const main = () => {
   const dirtype = '4';
   const goBack = `\u23CE\t${basepath}\t2010`;
   const rgx = /^([^\t]*)\t([^\t]+)(\t(\d+))?$/;
-  const rep = '{"name":"$2","sname":"$1","att":"$4"}';
+  const rep = '{"name":"$2","att":"$4","comment":"$1"}';
   const lfMeta = createLfMeta({basepath, dirtype, opts: metadata});
   const lfLines = createLfItems({lines: [goBack, ...data.lines], rgx, rep});
   [error, data] = writeLines({
@@ -64,7 +64,7 @@ const lang = {
 }[useLanguage()];
 
 const adjustArgs = (args = PPx.Arguments): {fmt: string; enc: LFEncode} => {
-  const arr: string[] = ['M wF20 S1 f14,0 s1', 'utf8'];
+  const arr: string[] = ['M wF20 S1 C13 s1', 'utf8'];
 
   for (let i = 0, k = args.length; i < k; i++) {
     arr[i] = args.Item(i);
@@ -76,4 +76,5 @@ const adjustArgs = (args = PPx.Arguments): {fmt: string; enc: LFEncode} => {
 
   return {fmt: arr[0], enc: arr[1] as LFEncode};
 };
+
 main();
