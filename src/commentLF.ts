@@ -11,12 +11,14 @@ import fso from '@ppmdev/modules/filesystem.ts';
 import {readLines, writeLines} from '@ppmdev/modules/io.ts';
 import {pathSelf} from '@ppmdev/modules/path.ts';
 import {ppm} from '@ppmdev/modules/ppm.ts';
+import {langCommentLF} from './mod/language.ts';
 
 type LFEncode = Omit<FileEncode, 'sjis'>;
 
 const COMMENT_FILENAME = '00_INDEX.TXT';
 const INDEX_ENCODE = 'utf16le';
 const {scriptName} = pathSelf();
+const lang = langCommentLF[useLanguage()];
 
 const main = () => {
   const commentPath = PPx.Extract(`%FD\\${COMMENT_FILENAME}`);
@@ -57,11 +59,6 @@ const main = () => {
 
   PPx.Execute(`*jumppath ${templistPath}`);
 };
-
-const lang = {
-  en: {notExists: 'Comment file does not exist'},
-  jp: {notExists: 'コメントファイルがありません'}
-}[useLanguage()];
 
 const adjustArgs = (args = PPx.Arguments): {fmt: string; enc: LFEncode} => {
   const arr: string[] = ['M wF20 S1 C13 s1', 'utf8'];

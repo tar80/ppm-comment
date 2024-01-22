@@ -14,8 +14,10 @@ import {useLanguage} from '@ppmdev/modules/data.ts';
 import fso from '@ppmdev/modules/filesystem.ts';
 import {ppm} from '@ppmdev/modules/ppm.ts';
 import {getRgx} from './mod/core.ts';
+import {langCommentSearch} from './mod/language.ts';
 
 const SEARCH_RULES = '([AND]: a.b, [MINUS]: a.b-, [OR]: a|b)';
+const lang = langCommentSearch[useLanguage()];
 
 const main = (): void => {
   const args = adjustArgs();
@@ -41,11 +43,6 @@ const main = (): void => {
 
   // PPx.Execute('*color back');
 };
-
-const lang = {
-  en: {title: 'Comment search'},
-  jp: {title: 'コメント検索'}
-}[useLanguage()];
 
 const adjustArgs = (args = PPx.Arguments): {useRgx: boolean; title: string; mode: string; complist: string} => {
   const arr = ['0', lang.title, 'e', ''];

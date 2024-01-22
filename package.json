@@ -1,6 +1,6 @@
 {
   "name": "@ppmdev/ppm-comment",
-  "version": "1.3.2",
+  "version": "1.3.3",
   "description": "plugin for ppm",
   "directories": {
     "doc": "doc"
