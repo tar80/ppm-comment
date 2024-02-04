@@ -1,13 +1,13 @@
 ﻿PPM_PLUGIN_NAME=ppm-comment
 
 #Plugin version
-VERSION=1.3.3
+VERSION=1.3.4
 
 #Requires ppm version
-PPM_VERSION=0.93
+PPM_VERSION=0.94
 
 #Requires PPx version
-PPX_VERSION=194
+PPX_VERSION=195
 
 #Requires PPx Script Module version
 SCRIPT_VERSION=21
