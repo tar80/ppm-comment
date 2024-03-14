@@ -1,13 +1,13 @@
 /* @file Search for string in comments
  * @arg 0 {number} - If non-zero, use RegExp
- * @arg 1 {string} - Title of comment search
- * @arg 2 {string} - Reference history of comment search
- * @arg 3 {string} - Path to comment completion list
+ * @arg 1 {string} - Title of the comment search
+ * @arg 2 {string} - A reference history of the comment search
+ * @arg 3 {string} - Specify the path to comment completion list
  *
  * NOTE: Comment search rules.
  *  And search    If it contains a "."
  *  Minus search  If it contains a "." and ends with "-"
- *  OR search     If it does not contain "." and contains "|"
+ *  OR search     If it does not contain "." and contains a "|"
  */
 
 import {useLanguage} from '@ppmdev/modules/data.ts';
@@ -16,7 +16,7 @@ import {ppm} from '@ppmdev/modules/ppm.ts';
 import {getRgx} from './mod/core.ts';
 import {langCommentSearch} from './mod/language.ts';
 
-const SEARCH_RULES = '([AND]: a.b, [MINUS]: a.b-, [OR]: a|b)';
+const SEARCH_RULES = '([AND]: ""word.word"", [MINUS]: ""word.ignoreword-"", [OR]: ""word|word"")';
 const lang = langCommentSearch[useLanguage()];
 
 const main = (): void => {
@@ -32,11 +32,11 @@ const main = (): void => {
 
   exitcode !== 0 && PPx.Quit(-1);
 
-  const containsWord = searchSyntax(input, args.useRgx);
+  const containWords = searchSyntax(input, args.useRgx);
 
   for (let i = PPx.EntryDisplayCount; i--; ) {
     const thisEntry = PPx.Entry.Item(i);
-    if (containsWord(thisEntry.Comment)) {
+    if (containWords(thisEntry.Comment)) {
       thisEntry.Hide();
     }
   }
