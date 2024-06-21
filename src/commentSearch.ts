@@ -15,24 +15,25 @@ import fso from '@ppmdev/modules/filesystem.ts';
 import {ppm} from '@ppmdev/modules/ppm.ts';
 import {getRgx} from './mod/core.ts';
 import {langCommentSearch} from './mod/language.ts';
+import {safeArgs} from '@ppmdev/modules/argument.ts';
 
 const SEARCH_RULES = '([AND]: ""word.word"", [MINUS]: ""word.ignoreword-"", [OR]: ""word|word"")';
 const lang = langCommentSearch[useLanguage()];
 
 const main = (): void => {
-  const args = adjustArgs();
-  const title = `${args.title} ${SEARCH_RULES}`;
+  const [useRgx, header, mode, compList] = safeArgs(false, lang.title, 'e', '');
+  const title = `${header} ${SEARCH_RULES}`;
   const postcmd = [`-detail:"user1"%%:*comletelist match:6 -module:off`];
 
-  if (fso.FileExists(args.complist)) {
-    postcmd.push(`-file:"${args.complist}"`);
+  if (fso.FileExists(compList)) {
+    postcmd.push(`-file:"${compList}"`);
   }
 
-  const [exitcode, input] = ppm.getinput({title, mode: args.mode, leavecancel: true, k: postcmd.join(' ')});
+  const [exitcode, input] = ppm.getinput({title, mode: mode, leavecancel: true, k: postcmd.join(' ')});
 
   exitcode !== 0 && PPx.Quit(-1);
 
-  const containWords = searchSyntax(input, args.useRgx);
+  const containWords = searchSyntax(input, useRgx);
 
   for (let i = PPx.EntryDisplayCount; i--; ) {
     const thisEntry = PPx.Entry.Item(i);
@@ -42,16 +43,6 @@ const main = (): void => {
   }
 
   // PPx.Execute('*color back');
-};
-
-const adjustArgs = (args = PPx.Arguments): {useRgx: boolean; title: string; mode: string; complist: string} => {
-  const arr = ['0', lang.title, 'e', ''];
-
-  for (let i = 0, k = args.length; i < k; i++) {
-    arr[i] = args.Item(i);
-  }
-
-  return {useRgx: arr[0] !== '0', title: arr[1], mode: arr[2], complist: arr[3]};
 };
 
 const searchSyntax = (input: string, useRgx: boolean): Function => {

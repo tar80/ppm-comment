@@ -1,6 +1,6 @@
-import PPx from '@ppmdev/modules/ppx';
+import PPx from '@ppmdev/modules/ppx.ts';
 global.PPx = Object.create(PPx)
-import {getRgx} from '../core'
+import {getRgx} from '../core.ts'
 
 
 describe('getRgx()', function () {
