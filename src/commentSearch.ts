@@ -38,7 +38,7 @@ const main = (): void => {
   for (let i = PPx.EntryDisplayCount; i--; ) {
     const thisEntry = PPx.Entry.Item(i);
     if (containWords(thisEntry.Comment)) {
-      thisEntry.Hide();
+      thisEntry.Hide;
     }
   }
 

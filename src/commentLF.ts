@@ -16,6 +16,7 @@ import {safeArgs} from '@ppmdev/modules/argument.ts';
 const COMMENT_KEY_ID = 'K_ppmComment';
 const COMMENT_FILENAME = '00_INDEX.TXT';
 const INDEX_ENCODE = 'utf16le';
+const RETURN_CHAR ='\u23CE'
 const {scriptName} = pathSelf();
 const lang = langCommentLF[useLanguage()];
 
@@ -41,7 +42,7 @@ const main = () => {
   const basepath = PPx.Extract('%FD');
   const dirtype = '4';
   const charset = fileEncode;
-  const goBack = `\u23CE\t${basepath}\t2010`;
+  const goBack = `${RETURN_CHAR}\t${basepath}\t2010`;
   const rgx = /^([^\t]*)\t([^\t]+)(\t(\d+))?$/;
   const rep = '{"name":"$1","att":"$4","comment":"$2"}';
   const lfMeta = createLfMeta({charset, basepath, dirtype, opts: metadata});
